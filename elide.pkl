@@ -1,0 +1,44 @@
+/// Omega Compressor - Elide Configuration
+@ModuleInfo { minPklVersion = "0.28.1" }
+module omega_compressor
+
+/// Project configuration
+project {
+  name = "omega-compressor"
+  version = "1.0.0"
+}
+
+/// Server configuration
+server {
+  port = 3000
+  host = "localhost"
+}
+
+/// AI/LLM configuration
+ai {
+  /// Default model for compression
+  defaultModel = "qwen"
+  
+  /// Allow auto-download of models
+  allowDownload = true
+  
+  /// Available models configuration
+  models {
+    qwen {
+      repo = "Qwen/Qwen2.5-1.5B-Instruct-GGUF"
+      name = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
+      displayName = "Qwen 2.5 1.5B"
+      size = "~1GB"
+      quality = "Excellent (native Chinese)"
+      speed = "Fast"
+    }
+    tinyllama {
+      repo = "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF"
+      name = "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+      displayName = "TinyLlama 1.1B"
+      size = "~600MB"
+      quality = "Moderate"
+      speed = "Very Fast"
+    }
+  }
+}

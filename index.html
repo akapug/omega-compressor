@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Omega Compressor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#12121a;--border:#2a2a3a;--text:#e0e0e8;--accent:#7c5cff}
+body{font-family:monospace;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.container{max-width:900px;margin:0 auto}
+h1{background:linear-gradient(135deg,var(--accent),#ff5c8a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+textarea,.output{width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:inherit;font-size:13px}
+.output{color:#ffd700;white-space:pre-wrap}
+.btn{background:var(--accent);color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;margin-top:10px}
+.btn:disabled{opacity:.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:#1a1a24;padding:10px;border-radius:8px;text-align:center}
+.stat-val{font-size:20px;font-weight:bold;color:var(--accent)}
+.stat-lbl{font-size:10px;color:#888}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Ω Omega Compressor</h1>
+<div class="grid">
+<div class="panel">
+<h3>Input Specification</h3>
+<textarea id="specIn" placeholder="Paste agent instructions..."></textarea>
+<button class="btn" onclick="doCompress()" id="btn">🔮 Compress</button>
+</div>
+<div class="panel">
+<h3>Omega Kernel</h3>
+<div class="output" id="out">Result will appear here...</div>
+<div class="stats" id="stats" style="display:none">
+<div class="stat"><div class="stat-val" id="ratio">-</div><div class="stat-lbl">Ratio</div></div>
+<div class="stat"><div class="stat-val" id="orig">-</div><div class="stat-lbl">Original</div></div>
+<div class="stat"><div class="stat-val" id="comp">-</div><div class="stat-lbl">Compressed</div></div>
+</div>
+</div>
+</div>
+</div>
+<script>
+async function doCompress() {
+  const spec = document.getElementById("specIn").value.trim();
+  if (!spec) return alert("Enter a spec");
+  const btn = document.getElementById("btn");
+  btn.disabled = true;
+  btn.textContent = "Compressing...";
+  document.getElementById("out").textContent = "...";
+  try {
+    const r = await fetch("http://localhost:8080/api/compress?spec=" + encodeURIComponent(spec));
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById("out").textContent = d.omega;
+      document.getElementById("stats").style.display = "grid";
+      document.getElementById("ratio").textContent = d.stats.charRatio + "x";
+      document.getElementById("orig").textContent = d.stats.originalChars;
+      document.getElementById("comp").textContent = d.stats.compressedChars;
+    } else {
+      document.getElementById("out").textContent = "Error: " + d.error;
+    }
+  } catch(e) {
+    document.getElementById("out").textContent = "Error: " + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = "🔮 Compress";
+}
+</script>
+</body>
+</html>

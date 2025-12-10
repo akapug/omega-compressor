@@ -1,0 +1,18 @@
+{
+  "name": "omega-compressor",
+  "version": "1.0.0",
+  "description": "Compress natural-language agent instructions into dense Omega-style DSL kernels",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "elide run server.js",
+    "dev": "elide run server.js --watch",
+    "test": "elide run tests/smoketest.js"
+  },
+  "keywords": ["omega", "compression", "dsl", "llm", "elide"],
+  "author": "Elide Team",
+  "license": "MIT",
+  "engines": {
+    "elide": ">=1.0.0-beta9"
+  }
+}

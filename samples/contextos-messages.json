@@ -1,0 +1,45 @@
+{
+  "description": "Sample contextOS MCP messages with their Omega compressed versions",
+  "samples": [
+    {
+      "id": "task-claim",
+      "input": "Agent claims task, publishes to group chat, waits for PR review, then releases the resource lock.",
+      "omega": "Ω核:代理占任·發群聊·待PR審·次釋資鎖",
+      "stats": {
+        "inputChars": 97,
+        "outputChars": 22,
+        "ratio": 4.4
+      }
+    },
+    {
+      "id": "handoff",
+      "input": "Handoff ready. Task complete. Files edited: server.ts, config.json. Pending: unit tests. Summary: implemented compression API.",
+      "omega": "Ω核:交接備·任完·檔改:server.ts·config.json·待:單測·摘:實壓縮API",
+      "stats": {
+        "inputChars": 125,
+        "outputChars": 42,
+        "ratio": 3.0
+      }
+    },
+    {
+      "id": "status-update",
+      "input": "Agent status: active. Working on: profile tool. Progress: 75%. Role: coder. Blocked: waiting for review.",
+      "omega": "Ω核:代理態:活·工:profile工具·進:75%·角:碼師·阻:待審",
+      "stats": {
+        "inputChars": 104,
+        "outputChars": 36,
+        "ratio": 2.9
+      }
+    },
+    {
+      "id": "resource-lock",
+      "input": "Resource lock acquired on branch feature/compression. Zone claimed: backend. Lock expires in 30 minutes.",
+      "omega": "Ω核:資鎖獲支feature/compression·區占:backend·鎖30分後過期",
+      "stats": {
+        "inputChars": 103,
+        "outputChars": 40,
+        "ratio": 2.6
+      }
+    }
+  ]
+}
