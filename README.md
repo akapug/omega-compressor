@@ -63,7 +63,7 @@ Reduce token/bandwidth costs in multi-agent systems by compressing natural langu
 ### Symbol Vocabulary
 
 | Symbol | Meaning | Example |
-|--------|---------|---------|
+|--------|---------|--------|
 | `→` | leads to, then | `訊至→析` (message arrives → analyze) |
 | `↦` | maps to, becomes | `意↦策` (intent maps to strategy) |
 | `·` | separator (and) | `簡·準·助` (concise · accurate · helpful) |
@@ -209,9 +209,11 @@ When implementing Omega compression in your agent:
 omega-compressor/
 ├── server-node.mts      # Main server with compression logic
 ├── README.md            # This spec document
+├── SPEC.md              # Full protocol specification
+├── dictionary.json      # Extensible dictionaries
 ├── tests/
 │   └── e2e.spec.js      # End-to-end tests
-└── samples/             # Example inputs/outputs (TODO)
+└── samples/             # Example inputs/outputs
 ```
 
 ## Roadmap
