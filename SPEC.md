@@ -93,7 +93,7 @@ This specification defines a multilayer compression protocol for agent-to-agent 
 | `→` | U+2192 | sequence, leads to | `A→B` (A then B) |
 | `↦` | U+21A6 | maps to, becomes | `意↦策` (intent maps to strategy) |
 | `·` | U+00B7 | separator, and | `簡·準·助` (concise and accurate and helpful) |
-| `\|` | U+007C | or, alternative | `A\|B` (A or B) |
+| `|` | U+007C | or, alternative | `A|B` (A or B) |
 | `¬` | U+00AC | not, negation | `¬猜` (do not guess) |
 | `>` | U+003E | priority | `意>詞` (intent over words) |
 
@@ -168,16 +168,6 @@ profile.capabilities = {
     modes: ['fast', 'llm'],
     dictionaries: ['core', 'contextOS']
   }
-};
-```
-
-### Compression Hints
-```typescript
-// Hint that message is compressed
-message = {
-  type: 'task',
-  content: 'Ω核:任分配·代理A→實·代理B→審',
-  encoding: 'omega/1.0'
 };
 ```
 
