@@ -328,11 +328,11 @@ The semantic compression in Chinese trades off against algorithmic compression.
 
 ---
 
-## Academic Landscape: Prompt Compression Techniques
+## Academic Landscape: Prompt Compression Techniques (Updated Dec 2025)
 
 ### Taxonomy of Approaches
 
-The academic literature reveals two major categories of prompt compression:
+The academic literature reveals three major categories of prompt compression:
 
 #### 1. Hard Prompt Methods (Token Removal)
 Keep natural language but remove tokens based on importance metrics.
@@ -345,7 +345,35 @@ Keep natural language but remove tokens based on importance metrics.
 | **SelectiveContext** | 10x | Self-information based | Preserve high-entropy tokens |
 | **Nano-Capsulator** | 5x | Paraphrasing | Rewrite to shorter form |
 
-#### 2. Soft Prompt Methods (Learned Embeddings)
+#### 2. Generative Compression Methods (NEW - 2025)
+Compress prompts by rewriting/summarizing rather than removing tokens.
+
+| Method | Compression | Approach | Key Insight |
+|--------|-------------|----------|-------------|
+| **SCOPE** (Aug 2025) | 2-5x | Semantic chunking + summarization | "Generative > token removal at high ratios" |
+| **CompactPrompt** (Oct 2025) | 2x | Hard pruning + n-gram abbreviation | "N-gram abbreviation is reversible and human-readable" |
+
+**SCOPE Key Findings** (Zhang et al., University of Florida):
+- Outperforms LLMLingua-2 on summarization and QA tasks
+- Uses BART for chunk summarization (no LLM calls needed)
+- Dynamic compression ratio per chunk based on relevance
+- Keyword extraction preserves critical information
+- **Most stable at high compression ratios** - exactly what Omega needs
+
+**CompactPrompt Key Findings** (BNY, Carnegie Mellon):
+- Achieves 60% token savings on financial QA benchmarks
+- N-gram abbreviation: replace frequent patterns with short tokens (like Omega!)
+- Best config: bi-grams with Top-3 frequency threshold
+- Claude 3.5 Sonnet benefits most from compression (+6-10% accuracy)
+- **Compression can IMPROVE accuracy** - validates our Omega findings
+
+**Relevance to Omega**: Both papers validate that:
+1. Generative/semantic compression beats token removal
+2. Abbreviation patterns (like Omega's Chinese chars) are effective
+3. Compression can improve task performance, not just save tokens
+4. Human-readable compression is valuable for debugging
+
+#### 3. Soft Prompt Methods (Learned Embeddings)
 Compress prompts into learned token embeddings.
 
 | Method | Compression | Approach | Key Insight |
@@ -659,4 +687,89 @@ source .env.local  # OPENROUTER_API_KEY
 ollama serve &     # for local model
 npx promptfoo eval --no-cache
 ```
+
+---
+
+## Use Case: Char-Limited Instructions (Dec 2025)
+
+### The Killer Demo: ChatGPT Personalization Box
+
+The ChatGPT personalization box has a **1500 character limit**. This is the perfect showcase for Omega:
+
+- User compressed 6k chars of English instructions → 1500 chars Omega
+- **4x compression** while maintaining semantic completeness
+- GPT-5 reportedly "loves" the semantic density
+
+### Why This Works
+
+1. **Hard char limits** force compression - no choice
+2. **Semantic density** matters more than token cost here
+3. **Human-readable** - user can still edit/understand the rules
+4. **Model-agnostic** - works regardless of tokenizer efficiency
+
+### Recommended Positioning
+
+Omega's primary value proposition:
+1. **Char-limited contexts** (ChatGPT personalization, SMS, tweets)
+2. **A2A with Qwen/DeepSeek** (token savings + semantic density)
+3. **Wire bandwidth** (fewer chars = better compression)
+
+NOT primarily for:
+- Token savings on GPT-4/Claude (actually costs more tokens)
+
+---
+
+## Integration: IntelliJ MCP Server (Dec 2025)
+
+### Problem: MCP Response Bloat
+
+Large MCP responses pollute agent context windows:
+- Responses persist in context until compaction
+- Compaction may lose important memories
+- File reads don't have this problem (processed and discarded)
+
+### Solution: Terminal Streaming Architecture
+
+```
+┌─────────────────────┐
+│ IntelliJ MCP Server │
+│ (built-in 2025.2+)  │
+└──────────┬──────────┘
+           │ execute_terminal_command
+           ▼
+┌─────────────────────┐
+│ Terminal Output     │
+│ → File/Stream       │
+└──────────┬──────────┘
+           │ Omega compress
+           ▼
+┌─────────────────────┐
+│ contextOS/agents    │
+│ read file (no bloat)│
+└─────────────────────┘
+```
+
+### IntelliJ MCP Server Tools
+
+| Tool | Purpose |
+|------|---------|
+| `execute_terminal_command` | Run shell commands |
+| `get_file_text_by_path` | Read file contents |
+| `search_in_files_by_regex` | Fast codebase search |
+| `get_file_problems` | Get errors/warnings |
+| `execute_run_configuration` | Run tests/builds |
+| `rename_refactoring` | Refactor symbols |
+
+### Setup
+
+1. Settings → Tools → MCP Server → Enable
+2. Auto-Configure for clients (Claude Desktop, Cursor, VS Code, etc.)
+3. Enable "Brave Mode" for automated agents (no confirmation prompts)
+
+### Benefits
+
+1. **No context pollution** - agents read files, not MCP responses
+2. **Omega compression** - terminal output compressed before storage
+3. **Team coordination** - each dev's IntelliJ contributes insights
+4. **Always-on awareness** - agents can poll terminal logs
 
