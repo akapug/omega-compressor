@@ -4,15 +4,17 @@
 
 ## Abstract
 
-This specification defines a multilayer compression protocol for agent-to-agent (A2A) communications. The protocol achieves 3-5x compression while preserving semantic fidelity, enabling efficient communication in bandwidth-constrained or token-limited environments.
+This specification defines a multilayer compression protocol for agent-to-agent (A2A) communications. The protocol achieves 3-5x compression while **often improving rule adherence** compared to English prompts. Testing across 7 models shows Omega prompts outperform English in 6 of 7 cases for rule enforcement scenarios.
 
 ## 1. Design Goals
 
 1. **Semantic Preservation** - Compressed output must preserve the exact meaning of the input
-2. **Deterministic** - Same input always produces same output (dictionary mode)
-3. **Layered** - Each compression layer is optional and composable
-4. **Extensible** - Domain dictionaries can be added without protocol changes
-5. **Human-Inspectable** - Compressed output uses meaningful symbols, not opaque binary
+2. **Rule Adherence** - Compressed format should maintain or improve instruction following
+3. **Deterministic** - Same input always produces same output (dictionary mode)
+4. **Layered** - Each compression layer is optional and composable
+5. **Extensible** - Domain dictionaries can be added without protocol changes
+6. **Human-Inspectable** - Compressed output uses meaningful symbols, not opaque binary
+7. **Model-Agnostic** - Works across model families (tested: GPT, Claude, Grok, Qwen, DeepSeek)
 
 ## 2. Protocol Layers
 

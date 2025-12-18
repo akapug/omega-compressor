@@ -4,6 +4,18 @@
 
 This repository defines the **Omega Compression Spec** for contextOS and serves as the canonical reference for implementing efficient A2A message compression.
 
+## Key Research Finding
+
+**Omega compression often IMPROVES rule adherence** compared to English prompts. Testing across 7 models (GPT-4.1, Claude Sonnet 4, Grok-3, Qwen, DeepSeek, local qwen2.5:3b) shows:
+
+| Result | Count |
+|--------|-------|
+| Omega outperformed English | 6/7 models |
+| Best improvement | +33% (GPT-4.1, Grok-3) |
+| Local 3B model | Tied for best performance |
+
+See [tests/FINDINGS.md](tests/FINDINGS.md) for full analysis.
+
 ## Purpose
 
 Reduce token/bandwidth costs in multi-agent systems by compressing natural language instructions into dense symbolic representations. Designed for:
@@ -216,8 +228,26 @@ omega-compressor/
 └── samples/             # Example inputs/outputs
 ```
 
+## Testing with promptfoo
+
+Run the evaluation suite to test Omega vs English prompts:
+
+```bash
+# Setup
+source .env.local  # OPENROUTER_API_KEY
+ollama serve &     # for local model
+
+# Run evaluation
+npx promptfoo eval --no-cache
+
+# View results
+npx promptfoo view
+```
+
 ## Roadmap
 
+- [x] promptfoo evaluation framework
+- [x] Local model support (ollama)
 - [ ] Static dictionary file (JSON) for easy extension
 - [ ] Pre-shared zstd dictionary for contextOS messages
 - [ ] Decompression endpoint for human-readable logs

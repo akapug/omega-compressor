@@ -31,3 +31,6 @@ playwright-report/
 # Temporary files
 *.tmp
 *.bak
+
+.env
+.env.local.env.local
