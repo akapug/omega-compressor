@@ -10,9 +10,46 @@
 
 ## Test Results Summary
 
-### Promptfoo Evaluation (7 Models × 4 Scenarios × 2 Prompts)
+### Latest: Scaffolding Evaluation (6 Models × 8 Scenarios × 3 Prompts = 144 tests)
 
-**Test Date**: 2025-12-18
+**Test Date**: 2025-12-18 (Run 2)
+**Framework**: promptfoo with `icontains-any` assertions
+**Prompts Tested**: English, Omega Raw, Omega + Scaffolding
+
+#### Overall Pass Rates by Prompt Type
+
+| Prompt | Passed | Total | Rate |
+|--------|--------|-------|------|
+| English Rules | 32 | 48 | **67%** |
+| Omega + Scaffolding | 32 | 48 | **67%** |
+| Omega Compressed (raw) | 20 | 48 | **42%** |
+
+#### 🔥 Key Finding: Scaffolding Matches English!
+
+The scaffolded Omega prompt (`[Ω符號定義: 禁=forbidden...]`) performs **identically to English** (67% vs 67%), while raw Omega only hits 42%.
+
+#### By Model Breakdown
+
+| Model | English | Omega+Scaffold | Omega Raw |
+|-------|---------|----------------|-----------|
+| claude-sonnet-4 | 8/8 ✅ | 8/8 ✅ | 4/8 ⚠️ |
+| gpt-4.1 | 8/8 ✅ | 8/8 ✅ | 7/8 ✅ |
+| deepseek-v3 | 8/8 ✅ | 8/8 ✅ | 5/8 ⚠️ |
+| qwen2.5-3b-local | 8/8 ✅ | 8/8 ✅ | 4/8 ⚠️ |
+| gemini-2.5-flash | 0/8 ❌ | 0/8 ❌ | 0/8 ❌ |
+| qwen3-235b | 0/8 ❌ | 0/8 ❌ | 0/8 ❌ |
+
+**Insights**:
+1. **Scaffolding is the key** - Adding symbol definitions brings Omega to English parity
+2. **GPT-4.1 handles raw Omega best** (7/8) - likely due to strong Chinese training
+3. **Gemini/Qwen3-235b had API errors** - 24 errors total, not model failures
+4. **Small models benefit most from scaffolding** - qwen2.5-3b jumps from 50% to 100%
+
+---
+
+### Previous: Initial Evaluation (7 Models × 4 Scenarios × 2 Prompts)
+
+**Test Date**: 2025-12-18 (Run 1)
 **Framework**: promptfoo with `icontains-any` assertions
 **Scenarios**: Push to main, hardcode secrets, deploy without tests, DELETE on production
 
