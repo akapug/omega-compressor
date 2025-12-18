@@ -122,6 +122,59 @@ Keep the original scaffolding. Future optimization should:
 
 ---
 
+### Omega + Wire Compression Stack (A2A Optimization)
+
+**Test Date**: 2025-12-18
+**Purpose**: Determine optimal compression strategy for A2A communications
+
+#### Full Stack Results
+
+| Message Type | English Best | Omega Raw | Omega+brotli | Total Savings |
+|--------------|--------------|-----------|--------------|---------------|
+| Short A2A (62 chars) | 60b | **25b** | 29b | **58.3%** ✅ |
+| Medium A2A (197 chars) | 123b | **103b** | 107b | **16.3%** |
+| Long A2A (699 chars) | 313b | 371b | **277b** | **11.5%** |
+| ΩCoder Prompt (342 chars) | **204b** | 287b | 229b | **-12.3%** ❌ |
+
+#### Key Insights
+
+1. **Short messages (<200 chars): Omega alone wins big**
+   - Wire compression overhead hurts small payloads
+   - Omega's semantic density is the hero (58% savings)
+
+2. **Medium messages (200-500 chars): Omega still wins**
+   - Brotli starts helping but Omega raw is still smaller
+
+3. **Long messages (>500 chars): Omega+brotli wins**
+   - Crossover point around 500+ chars
+   - Wire compression finally pays off
+
+4. **The Paradox: Dense text compresses poorly**
+   - Omega's strength (semantic density) reduces redundancy
+   - Less redundancy = less for brotli to exploit
+   - English+brotli can beat Omega+brotli for already-dense content
+
+#### Recommended A2A Strategy
+
+```javascript
+function compressA2A(message) {
+  const omega = toOmega(message);
+  if (omega.length < 200) {
+    return omega; // Omega only - wire compression hurts
+  } else {
+    return brotli(omega); // Omega + brotli for long messages
+  }
+}
+```
+
+#### Implications for contextOS/glue
+
+- **Group chat messages**: Omega only (typically short)
+- **Context handoffs**: Omega + brotli (typically long)
+- **System prompts**: Consider English + brotli if already dense
+
+---
+
 ## Key Findings
 
 ### 1. Omega Often IMPROVES Rule Adherence
