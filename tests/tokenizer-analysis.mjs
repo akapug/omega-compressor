@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 /**
  * Tokenizer Analysis: How different models tokenize Omega
- * 
+ *
  * Different models have different tokenizers, which affects actual token savings.
  * This test measures token counts across model families.
- * 
+ *
  * Usage: node tests/tokenizer-analysis.mjs
  */
 
-import { encode as gpt4Encode } from 'gpt-tokenizer';
+import { encoding_for_model } from 'tiktoken';
+
+// Get GPT-4 tokenizer (cl100k_base)
+const enc = encoding_for_model('gpt-4');
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TEST CONTENT
@@ -43,32 +46,28 @@ const OMEGA_SCAFFOLDED = `[Omega encoding: 禁=forbidden/never, →=leads to/the
 
 // GPT-4/GPT-4o tokenizer (cl100k_base)
 function countGPT4Tokens(text) {
-  return gpt4Encode(text).length;
+  return enc.encode(text).length;
 }
 
 // Approximate Claude tokenizer (similar to GPT-4 for most content)
 function countClaudeTokens(text) {
   // Claude uses a similar BPE tokenizer, roughly equivalent to GPT-4
-  return gpt4Encode(text).length;
+  return enc.encode(text).length;
 }
 
 // Approximate Qwen tokenizer (better Chinese support)
 // Qwen uses a 150k vocab with better CJK coverage
+// Based on Qwen docs: 1 token = 1.5-1.8 chars for Chinese, 3-4 chars for English
 function countQwenTokensApprox(text) {
-  // Qwen tokenizes Chinese more efficiently
-  // Rough approximation: Chinese chars are ~1.2 tokens each (vs ~2 for GPT-4)
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
   const otherChars = text.length - chineseChars;
-  
-  // GPT-4 baseline for non-Chinese
-  const gpt4Tokens = gpt4Encode(text).length;
-  
-  // Adjust for Qwen's better Chinese tokenization
-  // GPT-4 uses ~2 tokens per Chinese char, Qwen uses ~1.2
-  const chineseTokensGPT4 = chineseChars * 2;
-  const chineseTokensQwen = chineseChars * 1.2;
-  
-  return Math.round(gpt4Tokens - chineseTokensGPT4 + chineseTokensQwen);
+
+  // Qwen: ~1.65 chars per token for Chinese (midpoint of 1.5-1.8)
+  // Qwen: ~3.5 chars per token for English (midpoint of 3-4)
+  const chineseTokens = chineseChars / 1.65;
+  const englishTokens = otherChars / 3.5;
+
+  return Math.round(chineseTokens + englishTokens);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -126,3 +125,5 @@ console.log('in our promptfoo tests - they see more semantic content per token.'
 
 console.log('\n✅ Analysis complete!');
 
+// Cleanup
+enc.free();
