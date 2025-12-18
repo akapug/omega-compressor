@@ -175,35 +175,50 @@ function compressA2A(message) {
 
 ---
 
-### Tokenizer Analysis: Model Family Matters
+### Tokenizer Analysis: Model Family Matters (CORRECTED)
 
-**Test Date**: 2025-12-18
+**Test Date**: 2025-12-18 (Updated with tiktoken verification)
 **Purpose**: Understand why Omega works better on some models
 
-#### Token Counts by Model Family
+#### Verified Token Counts (GPT-4 cl100k_base)
 
-| Prompt | GPT-4/Claude | Qwen (approx) |
-|--------|--------------|---------------|
-| English Rules | 79 tokens | 79 tokens |
-| Omega Raw | 103 tokens | **51 tokens** |
-| Omega + Scaffold | 132 tokens | 78 tokens |
+```
+=== GPT-4 (cl100k_base) Token Analysis ===
+English:            79 tokens, 342 chars
+Omega:             141 tokens, 125 chars
+Omega+Scaffolding: 187 tokens, 236 chars
 
-#### Token Savings vs English
+Omega vs English:      178.5% (+62 tokens)
+Scaffolded vs English: 236.7% (+108 tokens)
 
-| Model Family | Omega Raw | Omega + Scaffold |
-|--------------|-----------|------------------|
-| GPT-4/Claude | **-30.4%** ❌ | **-67.1%** ❌ |
-| Qwen | **+35.4%** ✅ | **+1.3%** ✅ |
+Character compression: 2.74x (English has 217 more chars)
+```
 
-#### Critical Insight
+#### Tokenizer Efficiency Comparison
+
+| Model Family | Chinese chars/token | English chars/token | Source |
+|--------------|---------------------|---------------------|--------|
+| **GPT-4/Claude** | ~0.89 | ~4.3 | tiktoken cl100k_base |
+| **Qwen** | ~1.5-1.8 | ~3-4 | Qwen official docs |
+
+#### Token Costs by Model Family
+
+| Prompt | GPT-4/Claude | Qwen (estimated) |
+|--------|--------------|------------------|
+| English Rules | 79 tokens | ~85-114 tokens |
+| Omega Raw | **141 tokens** ❌ | ~70-83 tokens ✅ |
+| Omega + Scaffold | **187 tokens** ❌ | ~131-157 tokens |
+
+#### Critical Insight (CORRECTED)
 
 **GPT-4/Claude tokenizers are inefficient at Chinese!**
-- They use ~2 tokens per Chinese character
-- Omega actually COSTS MORE tokens on GPT-4!
+- They use ~1.13 tokens per Chinese character (0.89 chars/token)
+- Omega actually **COSTS 78% MORE tokens** on GPT-4!
+- Previous estimate of "~2 tokens per char" was worst-case, not average
 
 **Qwen tokenizers are efficient at Chinese!**
-- They use ~1.2 tokens per Chinese character
-- Omega provides real 35% token savings
+- They use ~0.56-0.67 tokens per Chinese character (1.5-1.8 chars/token)
+- Omega provides **real token savings** on Qwen
 
 #### Why Omega Still Works on GPT-4
 
@@ -211,13 +226,23 @@ Even though GPT-4 pays a token penalty for Omega, it still shows improved rule a
 1. **Semantic density per character** is higher (even if tokens are more)
 2. **Structural embedding** of rules (logic gates vs prose)
 3. **Chinese training data** includes formal/technical content
+4. **Attention patterns** may differ for logographic vs alphabetic text
+
+#### The Real Value of Omega
+
+Omega's value is **NOT** token savings on GPT-4/Claude. It's:
+1. **Semantic density** - more meaning per character for human readers
+2. **Qwen/DeepSeek optimization** - these have better Chinese tokenizers
+3. **Wire compression** - fewer chars = better gzip/brotli ratios
+4. **Rule adherence** - structural format may improve compliance
 
 #### Implications for A2A Protocol
 
-1. **Qwen-to-Qwen**: Use Omega (35% savings)
-2. **GPT-to-GPT**: Use English (Omega costs more tokens!)
-3. **Mixed**: Negotiate based on receiver's tokenizer
+1. **Qwen-to-Qwen**: Use Omega (token savings + semantic density)
+2. **GPT-to-GPT**: Use English (Omega costs 78% more tokens!)
+3. **Mixed**: Negotiate based on receiver's tokenizer family
 4. **Protocol negotiation**: Agents should advertise tokenizer efficiency
+5. **Wire compression**: Always use Omega for network transfer (fewer bytes)
 
 ---
 
