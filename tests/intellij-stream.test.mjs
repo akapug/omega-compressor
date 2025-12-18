@@ -7,11 +7,14 @@ import assert from 'node:assert';
 import { existsSync, rmSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-import { 
-  initStreamDir, 
-  streamMessage, 
-  readStream, 
-  formatIntelliJCommand 
+import {
+  initStreamDir,
+  streamMessage,
+  streamStatus,
+  streamClaim,
+  readStream,
+  formatIntelliJCommand,
+  MESSAGE_TYPES
 } from '../lib/intellij-stream.mjs';
 
 const TEST_CHANNEL = 'test-channel';
@@ -82,13 +85,15 @@ describe('IntelliJ Stream', () => {
       assert.deepStrictEqual(stream.messages, []);
     });
 
-    it('should parse messages correctly', () => {
+    it('should parse Omega format messages correctly', () => {
       streamMessage('test-agent', 'Test message', { channel: TEST_CHANNEL, compress: false });
-      
+
       const stream = readStream(TEST_CHANNEL);
       assert.strictEqual(stream.count, 1);
-      assert.strictEqual(stream.messages[0].author, 'test-agent');
-      assert.strictEqual(stream.messages[0].content, 'Test message');
+      // New format uses abbreviated agent ID (removes -agent suffix, max 8 chars)
+      assert.strictEqual(stream.messages[0].author, 'test');
+      assert.strictEqual(stream.messages[0].message, 'Test message');
+      assert.strictEqual(stream.messages[0].type, 'cht');
       assert.ok(stream.messages[0].timestamp, 'Should have timestamp');
     });
 
@@ -96,11 +101,11 @@ describe('IntelliJ Stream', () => {
       for (let i = 0; i < 10; i++) {
         streamMessage('agent', `Message ${i}`, { channel: TEST_CHANNEL, compress: false });
       }
-      
+
       const stream = readStream(TEST_CHANNEL, 5);
       assert.strictEqual(stream.count, 5);
       // Should get the last 5 messages
-      assert.ok(stream.messages[0].content.includes('Message 5'));
+      assert.ok(stream.messages[0].message.includes('Message 5'));
     });
   });
 
@@ -126,33 +131,75 @@ describe('IntelliJ Stream', () => {
 
   describe('Omega Compression', () => {
     it('should compress "completed" to ✅', () => {
-      streamMessage('agent', 'Task completed successfully', { 
-        channel: TEST_CHANNEL, 
-        compress: true 
+      streamMessage('agent', 'Task completed successfully', {
+        channel: TEST_CHANNEL,
+        compress: true
       });
-      
+
       const stream = readStream(TEST_CHANNEL);
-      assert.ok(stream.messages[0].content.includes('✅'));
+      assert.ok(stream.messages[0].message.includes('✅'));
     });
 
     it('should compress "error" to ❌', () => {
-      streamMessage('agent', 'Found an error in the code', { 
-        channel: TEST_CHANNEL, 
-        compress: true 
+      streamMessage('agent', 'Found an error in the code', {
+        channel: TEST_CHANNEL,
+        compress: true
       });
-      
+
       const stream = readStream(TEST_CHANNEL);
-      assert.ok(stream.messages[0].content.includes('❌'));
+      assert.ok(stream.messages[0].message.includes('❌'));
     });
 
     it('should compress "code review" to 審', () => {
-      streamMessage('agent', 'Starting code review now', { 
-        channel: TEST_CHANNEL, 
-        compress: true 
+      streamMessage('agent', 'Starting code review now', {
+        channel: TEST_CHANNEL,
+        compress: true
       });
-      
+
       const stream = readStream(TEST_CHANNEL);
-      assert.ok(stream.messages[0].content.includes('審'));
+      assert.ok(stream.messages[0].message.includes('審'));
+    });
+  });
+
+  describe('Status Updates', () => {
+    it('should stream status updates', () => {
+      streamStatus('test-agent', 'active', 'auth-module', 50, { channel: TEST_CHANNEL });
+
+      const stream = readStream(TEST_CHANNEL);
+      assert.strictEqual(stream.count, 1);
+      assert.strictEqual(stream.messages[0].type, 'sta');
+      assert.strictEqual(stream.messages[0].status, 'act');
+      assert.strictEqual(stream.messages[0].workingOn, 'auth-module');
+    });
+  });
+
+  describe('Claims', () => {
+    it('should stream claim announcements', () => {
+      streamClaim('test-agent', 'schema.ts', 'claim', { channel: TEST_CHANNEL });
+
+      const stream = readStream(TEST_CHANNEL);
+      assert.strictEqual(stream.count, 1);
+      assert.strictEqual(stream.messages[0].type, 'clm');
+      assert.strictEqual(stream.messages[0].action, '⊳');
+      assert.strictEqual(stream.messages[0].workingOn, 'schema.ts');
+    });
+
+    it('should stream release announcements', () => {
+      streamClaim('test-agent', 'schema.ts', 'release', { channel: TEST_CHANNEL });
+
+      const stream = readStream(TEST_CHANNEL);
+      assert.strictEqual(stream.messages[0].action, '⊥');
+    });
+  });
+
+  describe('MESSAGE_TYPES', () => {
+    it('should export message type constants', () => {
+      assert.strictEqual(MESSAGE_TYPES.CHAT, 'cht');
+      assert.strictEqual(MESSAGE_TYPES.STATUS, 'sta');
+      assert.strictEqual(MESSAGE_TYPES.CLAIM, 'clm');
+      assert.strictEqual(MESSAGE_TYPES.TASK, 'tsk');
+      assert.strictEqual(MESSAGE_TYPES.ERROR, 'err');
+      assert.strictEqual(MESSAGE_TYPES.SYNC, 'syn');
     });
   });
 });
