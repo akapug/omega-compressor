@@ -773,3 +773,66 @@ Large MCP responses pollute agent context windows:
 3. **Team coordination** - each dev's IntelliJ contributes insights
 4. **Always-on awareness** - agents can poll terminal logs
 
+---
+
+## Terminal Stream vs MCP Polling (2025-12-18)
+
+### The Problem
+
+MCP tool responses go INTO the agent's context window. Every `get-since` poll consumes context that could be used for actual work.
+
+### Test Results
+
+| Messages | MCP Polling | Stream (filtered) | Savings |
+|----------|-------------|-------------------|---------|
+| 10 | 3,765 bytes | 81 bytes | **97.8%** |
+| 25 | 8,855 bytes | 247 bytes | **97.2%** |
+| 50 | 17,323 bytes | 413 bytes | **97.6%** |
+| 100 | 34,307 bytes | 828 bytes | **97.6%** |
+
+### Key Insight
+
+- **MCP Polling**: 42K tokens/session on coordination = 33% of 128K context
+- **Terminal Stream**: 1K tokens/session = 0.8% of context
+- **Result**: 32x more context available for actual work
+
+### Implementation
+
+**Omega Stream Format**:
+```
+Ω{ts:HH:MM:SS|from:AGENT|ch:CHANNEL|t:TYPE|m:MESSAGE}
+```
+
+**Message Types**:
+- `cht` - Chat message
+- `sta` - Status update
+- `clm` - Claim announcement
+- `tsk` - Task update
+- `err` - Error
+- `syn` - Sync marker
+
+**Files**:
+- `omega-compressor/lib/intellij-stream.mjs` - Stream writer/reader
+- `contextOS/src/lib/omega/terminal-stream.ts` - TypeScript module
+- `contextOS/src/lib/convex-client/chat.ts` - Sync functions
+- `contextOS/src/lib/tool-handlers/group-chat.ts` - MCP actions
+
+### MCP Actions
+
+```json
+// Parse stream lines
+{ "action": "stream-parse", "lines": ["Ω{...}"] }
+
+// Sync to Convex
+{ "action": "stream-sync", "lines": ["Ω{...}"], "source": "intellij" }
+
+// Format for stream
+{ "action": "stream-format", "author": "opus", "message": "Hello" }
+```
+
+### Bottomline
+
+This is the difference between agents that can hold a 10-minute conversation vs agents that can hold a 5-hour conversation before context exhaustion.
+
+The "Angel Layer" isn't just about presence - it's about **sustainable presence**.
+
