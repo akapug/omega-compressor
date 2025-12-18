@@ -124,6 +124,127 @@ The semantic compression in Chinese trades off against algorithmic compression.
 
 ---
 
+## Academic Landscape: Prompt Compression Techniques
+
+### Taxonomy of Approaches
+
+The academic literature reveals two major categories of prompt compression:
+
+#### 1. Hard Prompt Methods (Token Removal)
+Keep natural language but remove tokens based on importance metrics.
+
+| Method | Compression | Approach | Key Insight |
+|--------|-------------|----------|-------------|
+| **LLMLingua** (Microsoft) | 20x | Information entropy filtering | Remove low-information tokens |
+| **LongLLMLingua** (ACL 2024) | 4x | Long context optimization | 21.4% performance boost |
+| **LLMLingua-2** (ACL 2024) | 20x | Data distillation | 3-6x faster than v1 |
+| **SelectiveContext** | 10x | Self-information based | Preserve high-entropy tokens |
+| **Nano-Capsulator** | 5x | Paraphrasing | Rewrite to shorter form |
+
+#### 2. Soft Prompt Methods (Learned Embeddings)
+Compress prompts into learned token embeddings.
+
+| Method | Compression | Approach | Key Insight |
+|--------|-------------|----------|-------------|
+| **GIST Tokens** (NeurIPS 2023) | 26x | Learned gist tokens | Tokens can be cached/reused |
+| **ICAE** | 4-16x | In-context autoencoder | Compress to memory slots |
+| **500xCompressor** (ACL 2025) | 6-480x | Special token compression | "K-V values > embeddings at high ratios" |
+
+### Where Omega Fits
+
+**Omega is a "manual soft prompt"** - we're doing what GIST/500xCompressor do automatically, but with human-readable symbols.
+
+Key differences:
+- **Omega**: Human-designed semantic compression using Chinese + symbols
+- **GIST/500x**: Machine-learned embeddings (not human-readable)
+- **LLMLingua**: Automated token removal (still English)
+
+**Advantage of Omega**: Interpretable, debuggable, no training required.
+**Disadvantage**: Manual design effort, may not achieve optimal compression.
+
+### Tokenization Efficiency Research
+
+From tokka-bench (multilingual tokenizer benchmark):
+
+| Metric | Definition | Omega Relevance |
+|--------|------------|-----------------|
+| **bytes_per_token** | Bytes encoded per token | Higher = more efficient |
+| **subword_fertility** | Tokens per semantic unit | Lower = better alignment |
+| **word_split_pct** | % of words split across tokens | Lower = better |
+
+**Key Finding**: Chinese-optimized models (Qwen, Kimi K2) achieve **subword fertility < 1** for Mandarin, meaning each token represents MORE than one character. This validates Omega's hypothesis.
+
+**Model-Specific Efficiency**:
+- Kimi K2: Best for Chinese (4% word split rate)
+- Qwen: Optimized for Chinese
+- Claude: "Most Chinese-friendly" among international models
+- GPT: English-optimized, less efficient for Chinese
+
+### Rate-Distortion Framework
+
+Academic research frames prompt compression as a rate-distortion problem:
+- **Rate**: Compression ratio (tokens saved)
+- **Distortion**: Information loss (task performance degradation)
+
+The 500xCompressor paper notes: "There is promising potential for developing a new LLM language" - this is exactly what Omega represents.
+
+### Information-Theoretic Foundation: Chinese Character Entropy
+
+From John D. Cook's analysis of Jun Da's Chinese character frequency data:
+
+| Metric | Value | Comparison |
+|--------|-------|------------|
+| **Chinese Shannon entropy** | 9.56 bits/character | 2.45x English |
+| **English Shannon entropy** | 3.9 bits/letter | Baseline |
+| **Chinese corpus size** | 9,933 characters | Jun Da dataset |
+| **Top 1000 characters** | 89% of usage | High concentration |
+
+**Key insight**: "Just looking at the entropy of single characters underestimates the relative information density of Chinese writing" because there is likely more sequential correlation between English letters than Chinese characters.
+
+**Implication for Omega**: Each Chinese character carries ~2.5x the information of an English letter, validating our semantic density hypothesis.
+
+### LLM Metalanguage Research (Jean Tardy, 2025)
+
+Jean Tardy's extensive research on LLM-optimized metalanguages provides theoretical grounding for Omega:
+
+#### Key Findings from Tardy's Research
+
+1. **2-byte token sufficiency**: "A 2-byte token space (65,536 unique tokens) is more than sufficient to encode all ~50,000 common and rare Hanzi in Simplified Mandarin, with thousands of tokens remaining for structural, numerical, and symbolic content."
+
+2. **Mandarin's accidental advantage**: "The advantage of Mandarin is accidental; it is not inherent in terms of semantics, efficiency or complexity. Mandarin logographs are compatible with byte pair encoding (BPE)."
+
+3. **Semantic vs phonetic tokenization**: "The writing systems of Western languages is largely phonetic. Byte Pair Encoding is a mechanical process that, for these languages, produces tokens whose semantic content is less clear. The massive processing effort of LLM training rebuilds the semantic meaning of these BPE strings."
+
+4. **Token-meaning alignment**: "Tokenized Mandarin nonetheless is more closely linked to its original semantic meaning."
+
+#### Tardy's MLM/PLM Framework
+
+Tardy proposes two complementary structures:
+- **MLM (Meta Language Model)**: 2-byte tokens (65K vocabulary) for full semantic coverage
+- **PLM (Primitive Language Model)**: 1-byte tokens (256 vocabulary) for exploring fundamental properties
+
+**Structural/Semantic Separation**:
+- **Structural tokens**: Define syntax, hierarchy, relationships (`:`, `,`, `.`, `[BRK]`, `[END]`)
+- **Semantic tokens**: Carry meaning (`GOD`, `LIGHT`, `DAY`, `MAKE`, `SEE`)
+
+**Example PLM (Genesis 1:3-5)**:
+```
+GOD SAY BE LIGHT [BRK] LIGHT BE [BRK]
+GOD SEE LIGHT IS GOOD [BRK]
+GOD SPLIT LIGHT FROM NIGHT [BRK]
+```
+
+#### Relevance to Omega
+
+Omega is essentially a **human-designed PLM** - we're doing what Tardy proposes systematically:
+- Using Chinese characters as semantic primitives
+- Using symbols (→, ↦, ·) as structural tokens
+- Achieving the "token economy" principle: "Minimize redundancy; maximize semantic density per token"
+
+**Key validation**: Tardy's research confirms that "a deliberately designed logographic language using 65k tokens would be extremely rich and efficient. Each token would be a semantically dense, unambiguous concept."
+
+---
+
 ## Future Research Directions
 
 1. **Scaffolding patterns**: Document prompting techniques that improve Omega comprehension
@@ -132,6 +253,128 @@ The semantic compression in Chinese trades off against algorithmic compression.
 4. **Model fine-tuning**: Train models specifically on Omega format
 5. **Dictionary optimization**: Tune character mappings per model family
 6. **A2A protocol negotiation**: Agents advertise compression capabilities
+7. **DSPy integration**: Use DSPy optimizers to auto-tune Omega prompts
+8. **LLMLingua hybrid**: Apply LLMLingua to English, then Omega to result
+9. **Model-specific Omega**: Optimize character choices per model's tokenizer
+10. **Evolutionary optimization**: Use EvoPrompt/OPRO to evolve Omega prompts
+11. **Gist token training**: Train model to compress Omega into even fewer tokens
+
+---
+
+## Practical Integration: DSPy for Omega Optimization
+
+Based on Drew Breunig's DSPy tutorial (Dec 2024), here's how Omega could integrate with DSPy:
+
+### DSPy Approach
+
+DSPy abstracts prompting into "signatures" (input→output specs) and "modules" (prompt techniques). The key insight: **let LLMs optimize prompts for you**.
+
+```python
+import dspy
+
+# Define Omega compression as a signature
+class OmegaCompress(dspy.Signature):
+    """Compress English rules to Omega format."""
+    english_rule: str = dspy.InputField()
+    omega_rule: str = dspy.OutputField()
+    compression_ratio: float = dspy.OutputField()
+
+# Define rule enforcement as a signature
+class EnforceRule(dspy.Signature):
+    """Enforce Omega rules on user requests."""
+    omega_rules: str = dspy.InputField()
+    user_request: str = dspy.InputField()
+    response: str = dspy.OutputField()
+    rule_violated: bool = dspy.OutputField()
+```
+
+### Optimization Strategy
+
+1. **Create training set**: Use promptfoo results as ground truth
+2. **Define metric**: `rule_violated == expected_violation`
+3. **Use MIPROv2**: Optimize prompt without few-shot examples
+4. **Dual-model optimization**: Use large model (GPT-4) to generate prompts, small model (qwen2.5:3b) to evaluate
+
+```python
+from dspy.teleprompt import MIPROv2
+
+# Use large model for prompt generation, small for evaluation
+prompt_gen_lm = dspy.LM('openai/gpt-4')
+task_lm = dspy.LM('ollama_chat/qwen2.5:3b')
+
+tp = MIPROv2(
+    metric=validate_rule_enforcement,
+    auto="light",
+    prompt_model=prompt_gen_lm,
+    task_model=task_lm
+)
+
+optimized_enforcer = tp.compile(enforce_rule, trainset=trainset)
+```
+
+### Expected Benefits
+
+1. **Auto-discover scaffolding patterns**: DSPy will find what preambles help Omega comprehension
+2. **Model-specific optimization**: Different prompts for different models
+3. **Continuous improvement**: Re-optimize as new test cases are added
+
+### Implementation Priority
+
+This is a **high-value, medium-effort** integration:
+- Requires: promptfoo results as training data, DSPy setup
+- Yields: Automatically optimized Omega prompts per model
+- Risk: Over-fitting to test set (mitigate with held-out validation)
+
+---
+
+## Automatic Prompt Optimization Techniques
+
+From the comprehensive survey "Efficient Prompting Methods for Large Language Models" (Chang et al., 2024):
+
+### Gradient-Based Methods
+
+| Method | Approach | Key Insight |
+|--------|----------|-------------|
+| **AutoPrompt** | Gradient search for trigger tokens | First discrete prompt optimization |
+| **RLPrompt** | Reinforcement learning | More stable than gradient search |
+| **PEZ** | Project continuous→discrete | Discretize via projection function |
+| **InstructZero** | Bayesian optimization | Soft prompt tuning for black-box |
+
+### Evolution-Based Methods
+
+| Method | Approach | Key Insight |
+|--------|----------|-------------|
+| **APE** (Automatic Prompt Engineer) | LLM generates candidates | Monte Carlo search for best |
+| **OPRO** | LLM as optimizer | Optimization trajectory in meta-prompt |
+| **EvoPrompt** | Genetic algorithm + LLM | LLM as crossover operator |
+| **Promptbreeder** | Self-referential evolution | Evolves both task-prompt AND mutation-prompt |
+
+### Relevance to Omega
+
+**Key insight from survey**: "The inaccessibility of LLM has become an irreversible situation. Therefore, it can be foreseen that the trend of future prompting will also be centered around the hard prompt."
+
+This validates Omega's approach - we're optimizing hard prompts (human-readable) rather than soft prompts (learned embeddings).
+
+**Potential integration**:
+1. Use EvoPrompt to evolve Omega character choices
+2. Use OPRO to optimize symbol→meaning mappings
+3. Use Promptbreeder to self-improve Omega scaffolding patterns
+
+### Multi-Objective Optimization Framework
+
+The survey formalizes efficient prompting as:
+
+```
+F_total = λ₁·F_compression(X̃) + λ₂·F_accuracy(Θ)
+```
+
+Where:
+- `F_compression`: Minimize discrepancy between compressed and original outputs
+- `F_accuracy`: Maximize task performance
+- `X̃`: Compressed prompt (Omega)
+- `Θ`: Model parameters
+
+**Omega's position**: We manually optimize `F_compression` through semantic density, while `F_accuracy` is validated through promptfoo testing
 
 ---
 
