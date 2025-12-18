@@ -22,7 +22,8 @@
     "elide": ">=1.0.0-beta9"
   },
   "dependencies": {
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "gpt-tokenizer": "^3.4.0"
   },
   "devDependencies": {
     "promptfoo": "^0.120.5"

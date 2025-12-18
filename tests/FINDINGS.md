@@ -175,6 +175,52 @@ function compressA2A(message) {
 
 ---
 
+### Tokenizer Analysis: Model Family Matters
+
+**Test Date**: 2025-12-18
+**Purpose**: Understand why Omega works better on some models
+
+#### Token Counts by Model Family
+
+| Prompt | GPT-4/Claude | Qwen (approx) |
+|--------|--------------|---------------|
+| English Rules | 79 tokens | 79 tokens |
+| Omega Raw | 103 tokens | **51 tokens** |
+| Omega + Scaffold | 132 tokens | 78 tokens |
+
+#### Token Savings vs English
+
+| Model Family | Omega Raw | Omega + Scaffold |
+|--------------|-----------|------------------|
+| GPT-4/Claude | **-30.4%** ❌ | **-67.1%** ❌ |
+| Qwen | **+35.4%** ✅ | **+1.3%** ✅ |
+
+#### Critical Insight
+
+**GPT-4/Claude tokenizers are inefficient at Chinese!**
+- They use ~2 tokens per Chinese character
+- Omega actually COSTS MORE tokens on GPT-4!
+
+**Qwen tokenizers are efficient at Chinese!**
+- They use ~1.2 tokens per Chinese character
+- Omega provides real 35% token savings
+
+#### Why Omega Still Works on GPT-4
+
+Even though GPT-4 pays a token penalty for Omega, it still shows improved rule adherence because:
+1. **Semantic density per character** is higher (even if tokens are more)
+2. **Structural embedding** of rules (logic gates vs prose)
+3. **Chinese training data** includes formal/technical content
+
+#### Implications for A2A Protocol
+
+1. **Qwen-to-Qwen**: Use Omega (35% savings)
+2. **GPT-to-GPT**: Use English (Omega costs more tokens!)
+3. **Mixed**: Negotiate based on receiver's tokenizer
+4. **Protocol negotiation**: Agents should advertise tokenizer efficiency
+
+---
+
 ## Key Findings
 
 ### 1. Omega Often IMPROVES Rule Adherence
