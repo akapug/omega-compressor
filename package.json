@@ -9,10 +9,22 @@
     "dev": "elide run server.js --watch",
     "test": "elide run tests/smoketest.js"
   },
-  "keywords": ["omega", "compression", "dsl", "llm", "elide"],
+  "keywords": [
+    "omega",
+    "compression",
+    "dsl",
+    "llm",
+    "elide"
+  ],
   "author": "Elide Team",
   "license": "MIT",
   "engines": {
     "elide": ">=1.0.0-beta9"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "promptfoo": "^0.120.5"
   }
 }

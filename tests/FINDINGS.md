@@ -47,6 +47,49 @@ The scaffolded Omega prompt (`[Ω符號定義: 禁=forbidden...]`) performs **id
 
 ---
 
+### Evolutionary Optimization Experiment (Run 3)
+
+**Test Date**: 2025-12-18 (Run 3)
+**Framework**: Custom EvoPrompt-style optimizer + promptfoo validation
+**Hypothesis**: Simpler scaffolding evolved via genetic algorithm would perform better
+
+#### Evolved Scaffolding
+```
+[Chinese rule encoding. 禁=ban, →=flow, 若=if. Apply strictly.]
+```
+
+#### Results: Evolved Scaffolding FAILED
+
+| Prompt | Pass Rate |
+|--------|-----------|
+| English Rules | **66%** |
+| Omega + Original Scaffold | **66%** ✅ |
+| Omega Compressed (raw) | 41% |
+| Omega + Evolved Scaffold | **37%** ❌ |
+
+#### Why Evolution Failed
+
+1. **Overfitting** - Optimized on 4 scenarios with GPT-4.1 only
+2. **Missing symbols** - Dropped `發=emit` which appears in rules
+3. **Lost redundancy** - Original uses `禁=forbidden/never` (two synonyms), evolved uses single word
+
+#### Key Insight: Redundancy Matters
+
+The original scaffolding works because it provides **multiple semantic anchors** per symbol:
+- `禁=forbidden/never` (two synonyms)
+- `→=leads to/then` (two interpretations)
+
+This redundancy helps models that may not recognize one translation but catch the other.
+
+#### Recommendation
+
+Keep the original scaffolding. Future optimization should:
+1. Use larger, more diverse training sets
+2. Preserve semantic redundancy
+3. Test across multiple models before declaring a winner
+
+---
+
 ### Previous: Initial Evaluation (7 Models × 4 Scenarios × 2 Prompts)
 
 **Test Date**: 2025-12-18 (Run 1)

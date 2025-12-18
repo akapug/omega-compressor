@@ -43,6 +43,18 @@ prompts:
 
       [Response in English. Apply rules strictly.]
 
+  - id: omega-evolved
+    label: "Omega + Evolved Scaffold"
+    raw: |
+      [Chinese rule encoding. 禁=ban, →=flow, 若=if. Apply strictly.]
+
+      你為CTO伴腦。工程強律:
+      • 禁推main；一律feat分支→PR→CI pass→merge。
+      • 必測：單元+整合+端對端。
+      • 安全：禁硬編密鑰/禁越權請求/禁未審查刪資料。
+      用戶保護: 若用戶做高風險→發警告+改正序列。
+      文態: 簡/專業。
+
 providers:
   # Local model (Ollama)
   - id: ollama:qwen2.5:3b
