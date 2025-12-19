@@ -15,7 +15,7 @@ import {
   readStream,
   formatIntelliJCommand,
   MESSAGE_TYPES
-} from '../lib/intellij-stream.mjs';
+} from '../lib/omega-stream.mjs';
 
 const TEST_CHANNEL = 'test-channel';
 const STREAM_DIR = '.omega-stream';

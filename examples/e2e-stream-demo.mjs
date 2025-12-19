@@ -15,7 +15,7 @@ import { join } from 'path';
 import {
   readStream,
   MESSAGE_TYPES
-} from '../lib/intellij-stream.mjs';
+} from '../lib/omega-stream.mjs';
 
 const STREAM_DIR = '.omega-stream';
 const CHANNEL = 'dev';

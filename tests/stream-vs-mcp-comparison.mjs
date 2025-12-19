@@ -7,7 +7,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { execSync } from 'child_process';
-import { streamMessage, readStream, MESSAGE_TYPES } from '../lib/intellij-stream.mjs';
+import { streamMessage, readStream, MESSAGE_TYPES } from '../lib/omega-stream.mjs';
 
 // Simulate MCP response (what get-since returns)
 function simulateMCPResponse(messageCount) {
