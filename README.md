@@ -20,7 +20,7 @@ See [tests/FINDINGS.md](tests/FINDINGS.md) for full analysis.
 
 Reduce token/bandwidth costs in multi-agent systems by compressing natural language instructions into dense symbolic representations. Designed for:
 
-- **contextOS MCP messages** - Agent coordination, task handoffs, status updates
+- **A2A MCP messages** - Agent coordination, task handoffs, status updates
 - **System prompts** - Compress verbose agent instructions for context window efficiency  
 - **A2A protocols** - Efficient inter-agent communication
 
@@ -252,7 +252,7 @@ npx promptfoo view
 - [ ] Pre-shared zstd dictionary for contextOS messages
 - [ ] Decompression endpoint for human-readable logs
 - [ ] Streaming compression for large documents
-- [ ] WHIPLASH native implementation (Rust + zstd)
+- [ ] rust native implementation (Rust + zstd)
 
 ## License
 
